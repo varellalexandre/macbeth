@@ -38,6 +38,7 @@ class Program_MC1_Constraints:
         set:pd.DataFrame
     ):
         ordered_prefs = [row[0] for idx,row in set.iterrows()]
+        #Constraint (2)
         for category in range(2,6):
             var_k = getattr(
                 vars,
@@ -65,7 +66,63 @@ class Program_MC1_Constraints:
         for x,name_x in enumerate(ordered_prefs):
             next = x+1
             for y,name_y in enumerate(ordered_prefs[next:]):
-                print(name_x,name_y,set[name_y][x])
+                ux = getattr(
+                    vars,
+                    name_x
+                )
+                uy = getattr(
+                    vars,
+                    name_y
+                )
+                #Constraint (3)
+                constr = solver.Constraint(
+                    0,
+                    solver.infinity()
+                )
+                constr.SetCoefficient(ux,1)
+                constr.SetCoefficient(uy,-1)
+                constr.SetCoefficient(vars.theta,-1)
+
+                #Constraint(5)
+                value = set[name_y][x]
+                sk_1 = getattr(
+                        vars,
+                        "s{category}".format(category=value-1)
+                )
+                lower_constr = solver.Constraint(
+                    -solver.infinity(),
+                    0
+                )
+                lower_constr.SetCoefficient(sk_1,1)
+                lower_constr.SetCoefficient(vars.theta,1)
+                lower_constr.SetCoefficient(vars.Cmin,-1)
+                lower_constr.SetCoefficient(ux,-1)
+                lower_constr.SetCoefficient(uy,1)
+                if value < 6:
+                    upper_constr = solver.Constraint(
+                        -solver.infinity(),
+                        0
+                    )
+                    sk = getattr(
+                            vars,
+                            "s{category}".format(category=value)
+                    )
+                    upper_constr.SetCoefficient(sk,-1)
+                    upper_constr.SetCoefficient(vars.Cmin,-1)
+                    upper_constr.SetCoefficient(ux,1)
+                    upper_constr.SetCoefficient(uy,-1)
+
+class Program_MC1_Objective:
+    def __init__(
+        self,
+        solver:pywraplp.Solver,
+        vars:Program_MC1_Vars,
+        set:pd.DataFrame
+    ):
+        self.solver = solver
+        self.objective = solver.Objective()
+        self.objective.SetCoefficient(vars.Cmin,1)
+        self.objective.SetMinimization()
 
 class Program_MC1:
 
@@ -75,7 +132,7 @@ class Program_MC1:
             pywraplp.Solver.GLOP_LINEAR_PROGRAMMING
         )
         self.vars_object = Program_MC1_Vars
-        self.objective_object = ObjectiveInterface
+        self.objective_object = Program_MC1_Objective
         self.constraints_object = Program_MC1_Constraints
         self.set = set
 
@@ -88,7 +145,22 @@ class Program_MC1:
             vars,
             self.set,
         )
-        print(len(self.solver.constraints()))
+        objective = self.objective_object(
+            self.solver,
+            vars,
+            self.set,
+        )
+        self.solver.Solve()
+        print(vars.Cmin.solution_value())
+        for category in ordered_prefs:
+            print("{category}".format(category=category))
+            print(
+                getattr(
+                    vars,
+                    "{category}".format(category=category)
+                ).solution_value()
+            )
+
 
 
 class Macbeth:
