@@ -11,20 +11,25 @@ class Categories(Enum):
     VERY_STRONG=5
     EXTREME=6
 
-class ORInterface:
-    def formula(self):
-        raise Exception('Function Not implemented!')
+class Problem(pywraplp.Solver):
+    def __init__(
+        self,
+        name,
+        solver_type=pywraplp.Solver.GLOP_LINEAR_PROGRAMMING
+    ):
+        super(Problem,self).__init__(
+            name,
+            solver_type
+        )
 
-class ConstraintInterface(ORInterface):
-    def __init__(self,solver:pywraplp.Solver,bound:tuple):
-        self.restriction = solver.Constraint(*bound)
+    def schematize(self,**kwargs):
+        raise Exception('Schematize not implemented')
 
-    def formula(self):
-        return self.restriction
+class Vars:
+    def __init__(self,**kwargs):
+        raise Exception('Vars constructor not implemented')
 
-class ObjectiveInterface(ORInterface):
-    def __init__(self,solver:pywraplp.Solver):
-        self.objective = solver.Objective()
 
-    def formula(self):
-        return self.objective
+class Constraint:
+    def __init__(self,vars:Vars,set:pd.DataFrame,**kwargs):
+        raise Exception('Constraint constructor not implemented')
