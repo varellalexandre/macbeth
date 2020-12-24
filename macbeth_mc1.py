@@ -19,15 +19,16 @@ class ProgramMC1Vars(Vars):
             )
         self.theta = solver.NumVar(0,solver.infinity(),'theta')
         self.Cmin = solver.NumVar(0,solver.infinity(),'Cmin')
-        for element in set:
+        for num,element in enumerate(set):
+            print(element)
             var = solver.NumVar(
                 0,
                 solver.infinity(),
-                element
+                "u(x_{})".format(num)
             )
             setattr(
                 self,
-                element,
+                "u(x_{})".format(num),
                 var
             )
 
@@ -92,12 +93,12 @@ class ProgramMC1(Problem):
         )
         self.Solve()
         print("Cmin",vars.Cmin.solution_value())
-        for category in ordered_prefs:
+        for pos,category in enumerate(ordered_prefs):
             print("{category}".format(category=category))
             print(
                 getattr(
                     vars,
-                    "{category}".format(category=category)
+                    "u(x_{})".format(pos)
                 ).solution_value()
             )
         for category in range(6):
