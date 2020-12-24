@@ -104,3 +104,12 @@ class Constraint_5(Constraint):
                     upper_constr.SetCoefficient(vars.Cmin,-1)
                     upper_constr.SetCoefficient(ux,1)
                     upper_constr.SetCoefficient(uy,-1)
+
+class Constraint_7(Constraint):
+    def __init__(
+        self,
+        vars:Vars,
+        set:pd.DataFrame,
+        solver:pywraplp.Solver
+    ):
+        pass

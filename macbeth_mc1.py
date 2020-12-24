@@ -21,7 +21,7 @@ class ProgramMC1Vars(Vars):
         self.Cmin = solver.NumVar(0,solver.infinity(),'Cmin')
         for element in set:
             var = solver.NumVar(
-                -solver.infinity(),
+                0,
                 solver.infinity(),
                 element
             )
@@ -100,7 +100,14 @@ class ProgramMC1(Problem):
                     "{category}".format(category=category)
                 ).solution_value()
             )
-
+        for category in range(6):
+            print('s{category}'.format(category=category))
+            print(
+                getattr(
+                    vars,
+                    's{category}'.format(category=category)
+                ).solution_value()
+            )
 
 if __name__ == '__main__':
     frame = pd.read_excel('exemplo MacBeth.xlsx')
