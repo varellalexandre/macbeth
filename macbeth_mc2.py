@@ -165,7 +165,8 @@ class ProgramMC2(Problem):
             self.set,
         )
         self.Solve()
-        logging.debug("Cmin",vars.Cmin.solution_value())
+        logging.debug("Cmin")
+        logging.debug(vars.Cmin.solution_value())
         for pos,category in enumerate(ordered_prefs):
             logging.debug("{category}".format(category=category))
             logging.debug(
@@ -184,6 +185,10 @@ class ProgramMC2(Problem):
             )
 
 if __name__ == '__main__':
-    frame = pd.read_excel('exemplo MacBeth.xlsx')
+    logging.basicConfig(
+        format='[%(asctime)s][%(levelname)s] - %(message)s',
+        level=logging.DEBUG
+    )
+    frame = pd.read_excel('total.xlsx')
     mc2 = ProgramMC2(frame)
     mc2.schematize()
