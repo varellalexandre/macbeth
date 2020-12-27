@@ -1,9 +1,14 @@
-from macbeth_interfaces import *
-from constraints import *
+from .macbeth_interfaces import *
+from .constraints import *
+import logging
 
 
 class ProgramMC1Vars(Vars):
-    def __init__(self,solver:pywraplp.Solver,set:list):
+    def __init__(
+        self,
+        solver:pywraplp.Solver,
+        set:list
+    ):
         self.s0 = solver.NumVar(0,0,'s0')
         self.s1 = solver.NumVar(1,1,'s1')
         for category in range(2,6):
@@ -20,7 +25,6 @@ class ProgramMC1Vars(Vars):
         self.theta = solver.NumVar(0,solver.infinity(),'theta')
         self.Cmin = solver.NumVar(0,solver.infinity(),'Cmin')
         for num,element in enumerate(set):
-            print(element)
             var = solver.NumVar(
                 0,
                 solver.infinity(),
@@ -39,7 +43,7 @@ class ProgramMC1Constraints(Constraint):
         self,
         solver:pywraplp.Solver,
         vars:Vars,
-        set:pd.DataFrame
+        set:dict
     ):
         constraints = [
             Constraint_2,
@@ -52,12 +56,13 @@ class ProgramMC1Constraints(Constraint):
                 vars = vars,
                 set = set
             )
+
 class ProgramMC1Objective:
     def __init__(
         self,
         solver:pywraplp.Solver,
         vars:Vars,
-        set:pd.DataFrame
+        set:dict
     ):
         self.solver = solver
         self.objective = solver.Objective()
@@ -65,7 +70,7 @@ class ProgramMC1Objective:
         self.objective.SetMinimization()
 
 class ProgramMC1(Problem):
-    def __init__(self,set:pd.DataFrame):
+    def __init__(self,set:dict):
         super(ProgramMC1,self).__init__(
             'MC1'
         )
@@ -75,8 +80,8 @@ class ProgramMC1(Problem):
         self.set = set
 
 
-    def schematize(self):
-        ordered_prefs = [row[0] for idx,row in self.set.iterrows()]
+    def calculate(self)->dict:
+        ordered_prefs = self.set['ordered_prefs']
         vars = self.vars_object(
             self,
             ordered_prefs
@@ -92,25 +97,28 @@ class ProgramMC1(Problem):
             self.set,
         )
         self.Solve()
-        print("Cmin",vars.Cmin.solution_value())
+        logging.debug("Cmin")
+        logging.debug(vars.Cmin.solution_value())
+        return_dict = dict()
+        return_dict['Cmin'] = vars.Cmin.solution_value()
         for pos,category in enumerate(ordered_prefs):
-            print("{category}".format(category=category))
-            print(
-                getattr(
-                    vars,
-                    "u(x_{})".format(pos)
-                ).solution_value()
+            logging.debug("{category}".format(category=category))
+            return_dict["u(x_{})".format(pos)] = getattr(
+                                                    vars,
+                                                    "u(x_{})".format(pos)
+                                                ).solution_value()
+            logging.debug(
+                return_dict["u(x_{})".format(pos)]
             )
         for category in range(6):
-            print('s{category}'.format(category=category))
-            print(
-                getattr(
-                    vars,
-                    's{category}'.format(category=category)
-                ).solution_value()
+            logging.debug('s{category}'.format(category=category))
+            return_dict[
+                's{category}'.format(category=category)
+            ] = getattr(
+                vars,
+                's{category}'.format(category=category)
+            ).solution_value()
+            logging.debug(
+                return_dict['s{category}'.format(category=category)]
             )
-
-if __name__ == '__main__':
-    frame = pd.read_excel('exemplo MacBeth.xlsx')
-    mc1 = ProgramMC1(frame)
-    mc1.schematize()
+        return return_dict

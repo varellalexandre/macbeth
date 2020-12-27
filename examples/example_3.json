@@ -1,0 +1,85 @@
+{
+  "ordered_prefs":["San Francisco","Boston","San Diego","Los Angeles","Chicago","Ann Arbor"],
+  "name":"Total Aluguel",
+  "type":"numeric",
+  "San Francisco":{
+    "relations":{
+      "Boston":{
+        "upper":3,
+        "lower":3
+      },
+      "San Diego":{
+        "upper":4,
+        "lower":4
+      },
+      "Los Angeles":{
+        "upper":4,
+        "lower":4
+      },
+      "Chicago":{
+        "upper":5,
+        "lower":5
+      },
+      "Ann Arbor":{
+        "upper":6,
+        "lower":6
+      }
+    }
+  },
+  "Boston":{
+    "relations":{
+      "San Diego":{
+        "upper":1,
+        "lower":1
+      },
+      "Los Angeles":{
+        "upper":2,
+        "lower":2
+      },
+      "Chicago":{
+        "upper":3,
+        "lower":3
+      },
+      "Ann Arbor":{
+        "upper":4,
+        "lower":4
+      }
+    }
+  },
+  "San Diego":{
+    "relations":{
+      "Los Angeles":{
+        "upper":1,
+        "lower":1
+      },
+      "Chicago":{
+        "upper":3,
+        "lower":3
+      },
+      "Ann Arbor":{
+        "upper":4,
+        "lower":4
+      }
+    }
+  },
+  "Los Angeles":{
+    "relations":{
+      "Chicago":{
+        "upper":2,
+        "lower":2
+      },
+      "Ann Arbor":{
+        "upper":3,
+        "lower":3
+      }
+    }
+  },
+  "Chicago":{
+    "relations":{
+      "Ann Arbor":{
+        "upper":1,
+        "lower":1
+      }
+    }
+  }
+}

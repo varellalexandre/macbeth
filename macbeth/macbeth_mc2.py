@@ -1,5 +1,6 @@
-from macbeth_interfaces import *
-from constraints import *
+from .macbeth_interfaces import *
+from .constraints import *
+import logging
 
 class ProgramMC2Vars(Vars):
     def __init__(
@@ -39,7 +40,6 @@ class ProgramMC2Vars(Vars):
         for x,name_x in enumerate(ordered_prefs):
             next = x+1
             for y,name_y in enumerate(ordered_prefs[next:]):
-                value = set[name_y][x]
                 vars = [
                     'ep',
                     'n',
@@ -72,16 +72,17 @@ class ProgramMC2Objective:
         self,
         solver:pywraplp.Solver,
         vars:Vars,
-        set:pd.DataFrame
+        set:dict
     ):
         self.solver = solver
         self.objective = solver.Objective()
-        ordered_prefs = [row[0] for idx,row in set.iterrows()]
+        ordered_prefs = set['ordered_prefs']
         for x,name_x in enumerate(ordered_prefs):
             next = x+1
             for y,name_y in enumerate(ordered_prefs[next:]):
-                value = set[name_y][x]
-                if value < 6:
+                lower_bound = set[name_x]['relations'][name_y]['lower']
+                upper_bound = set[name_x]['relations'][name_y]['upper']
+                if lower_bound < 6:
                     self.objective.SetCoefficient(
                         getattr(
                             vars,
@@ -120,7 +121,7 @@ class ProgramMC2Constraints(Constraint):
         self,
         solver:pywraplp.Solver,
         vars:Vars,
-        set:pd.DataFrame
+        set:dict
     ):
         constraints = [
             Constraint_2,
@@ -138,7 +139,10 @@ class ProgramMC2Constraints(Constraint):
             )
 
 class ProgramMC2(Problem):
-    def __init__(self,set:pd.DataFrame):
+    def __init__(
+        self,
+        set:dict
+    ):
         super(ProgramMC2,self).__init__(
             'MC2'
         )
@@ -147,8 +151,8 @@ class ProgramMC2(Problem):
         self.constraints_object = ProgramMC2Constraints
         self.set = set
 
-    def schematize(self):
-        ordered_prefs = [row[0] for idx,row in self.set.iterrows()]
+    def calculate(self):
+        ordered_prefs = self.set['ordered_prefs']
         vars = self.vars_object(
             self,
             ordered_prefs,
@@ -167,28 +171,27 @@ class ProgramMC2(Problem):
         self.Solve()
         logging.debug("Cmin")
         logging.debug(vars.Cmin.solution_value())
+        return_dict = dict()
+        return_dict['Cmin'] = vars.Cmin.solution_value()
         for pos,category in enumerate(ordered_prefs):
             logging.debug("{category}".format(category=category))
+            return_dict["u(x_{})".format(pos)] = getattr(
+                                                    vars,
+                                                    "u(x_{})".format(pos)
+                                                ).solution_value()
             logging.debug(
-                getattr(
-                    vars,
-                    "u(x_{})".format(pos)
-                ).solution_value()
+                return_dict["u(x_{})".format(pos)]
             )
         for category in range(6):
             logging.debug('s{category}'.format(category=category))
+            return_dict[
+                's{category}'.format(category=category)
+            ] = getattr(
+                vars,
+                's{category}'.format(category=category)
+            ).solution_value()
             logging.debug(
-                getattr(
-                    vars,
-                    's{category}'.format(category=category)
-                ).solution_value()
+                return_dict['s{category}'.format(category=category)]
             )
-
-if __name__ == '__main__':
-    logging.basicConfig(
-        format='[%(asctime)s][%(levelname)s] - %(message)s',
-        level=logging.DEBUG
-    )
-    frame = pd.read_excel('total.xlsx')
-    mc2 = ProgramMC2(frame)
-    mc2.schematize()
+        return return_dict
+        self.set

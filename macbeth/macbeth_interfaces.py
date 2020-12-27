@@ -2,15 +2,6 @@ from ortools.linear_solver import pywraplp
 from enum import Enum
 import pandas as pd
 
-class Categories(Enum):
-    NONE=0
-    NEGLIGIBLE_OR_VERY_WEAK=1
-    WEAK=2
-    MODERATE=3
-    STRONG=4
-    VERY_STRONG=5
-    EXTREME=6
-
 class Problem(pywraplp.Solver):
     def __init__(
         self,

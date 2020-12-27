@@ -1,5 +1,5 @@
-from macbeth_interfaces import *
-from constraints import *
+from .macbeth_interfaces import *
+from .constraints import *
 
 class ProgramMC4Vars(Vars):
     def __init__(

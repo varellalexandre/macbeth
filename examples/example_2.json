@@ -1,0 +1,25 @@
+{
+  "ordered_prefs":["4","3","2"],
+  "name":"Quantidade de Quartos",
+  "type":"integer",
+  "4":{
+    "relations":{
+      "3":{
+        "upper":3,
+        "lower":3
+      },
+      "2":{
+        "upper":3,
+        "lower":3
+      }
+    }
+  },
+  "3":{
+    "relations":{
+      "2":{
+        "upper":2,
+        "lower":2
+      }
+    }
+  }
+}
