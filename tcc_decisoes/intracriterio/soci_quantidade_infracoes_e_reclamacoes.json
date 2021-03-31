@@ -1,0 +1,13 @@
+{
+  "ordered_prefs":["0","1"],
+  "name":"Quantidade de infrações e reclamações recebidas",
+  "type":"numeric",
+  "1":{
+    "relations":{
+      "0":{
+        "upper":3,
+        "lower":3
+      }
+    }
+  }
+}

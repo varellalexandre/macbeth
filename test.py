@@ -28,7 +28,7 @@ def test_lpmacbeth()->None:
         format='[%(asctime)s][%(levelname)s] - %(message)s',
         level=logging.DEBUG
     )
-    file_example_2 = open('examples/example_4.json')
+    file_example_2 = open('examples/example_3.json')
     example_2 = json.load(file_example_2)
     lp = LPMacbeth(example_2)
     response = lp.calculate()
