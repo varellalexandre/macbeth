@@ -80,43 +80,62 @@ class LPMacbethConstraints(Constraint):
             for y,name_y in enumerate(ordered_prefs[next:]):
                 lower_bound = set[name_x]['relations'][name_y]['lower']
                 upper_bound = set[name_x]['relations'][name_y]['upper']
-                s_lower = getattr(
-                    vars,
-                    "s_{}".format(lower_bound)
-                )
-                var_x = getattr(
-                    vars,
-                    "x_{}".format(x)
-                )
-                var_y = getattr(
-                    vars,
-                    "x_{}".format(y+next)
-                )
-                logging.debug("s_{s}+0.5<=x_{x}-x_{y}".format(
-                        s = lower_bound,
-                        x = x,
-                        y = y+next
-                    )
-                )
-                c2 = solver.Constraint(-solver.infinity(),-0.5)
-                c2.SetCoefficient(s_lower,1)
-                c2.SetCoefficient(var_x,-1)
-                c2.SetCoefficient(var_y,1)
-                if upper_bound < 6:
-                    s_upper = getattr(
+                if lower_bound == 0:
+                    var_x = getattr(
                         vars,
-                        "s_{}".format(upper_bound+1)
+                        "x_{}".format(x)
                     )
-                    c3 = solver.Constraint(-solver.infinity(),-0.5)
-                    c3.SetCoefficient(s_upper,-1)
-                    c3.SetCoefficient(var_x,1)
-                    c3.SetCoefficient(var_y,-1)
-                    logging.debug("x_{x}-x_{y}<=s_{s}-0.5".format(
-                            s = upper_bound,
+                    var_y = getattr(
+                        vars,
+                        "x_{}".format(y+next)
+                    )
+                    logging.debug("x_{x}-x_{y}=0".format(
                             x = x,
                             y = y+next
                         )
                     )
+                    c2 = solver.Constraint(0,0)
+                    c2.SetCoefficient(var_x,1)
+                    c2.SetCoefficient(var_y,-1)
+
+                elif lower_bound > 0:
+                    s_lower = getattr(
+                        vars,
+                        "s_{}".format(lower_bound)
+                    )
+                    var_x = getattr(
+                        vars,
+                        "x_{}".format(x)
+                    )
+                    var_y = getattr(
+                        vars,
+                        "x_{}".format(y+next)
+                    )
+                    logging.debug("s_{s}+0.5<=x_{x}-x_{y}".format(
+                            s = lower_bound,
+                            x = x,
+                            y = y+next
+                        )
+                    )
+                    c2 = solver.Constraint(-solver.infinity(),-0.5)
+                    c2.SetCoefficient(s_lower,1)
+                    c2.SetCoefficient(var_x,-1)
+                    c2.SetCoefficient(var_y,1)
+                    if upper_bound < 6:
+                        s_upper = getattr(
+                            vars,
+                            "s_{}".format(upper_bound+1)
+                        )
+                        c3 = solver.Constraint(-solver.infinity(),-0.5)
+                        c3.SetCoefficient(s_upper,-1)
+                        c3.SetCoefficient(var_x,1)
+                        c3.SetCoefficient(var_y,-1)
+                        logging.debug("x_{x}-x_{y}<=s_{s}-0.5".format(
+                                s = upper_bound,
+                                x = x,
+                                y = y+next
+                            )
+                        )
 
 
 class LPMacbethObjective:
